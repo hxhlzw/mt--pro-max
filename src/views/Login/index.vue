@@ -96,7 +96,7 @@ const send = async () => {
   clearInterval(timeId)
   timeId = setInterval(() => {
     time.value--
-  }, 1000)
+  }, 1050)
 }
 
 const agree = ref<boolean>(false)
