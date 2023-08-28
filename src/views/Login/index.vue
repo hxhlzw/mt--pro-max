@@ -108,7 +108,7 @@ const hanleLogin = async () => {
     : await loginByMobile(loginForm.value.mobile, code.value)
 
   showToast(loginRes.data.code)
-  store.setUser(loginRes.data.token)
+  store.setUser(loginRes.data)
   router.push((route.query.returnUrl as string) || '/user')
   showToast('登录成功')
 }
