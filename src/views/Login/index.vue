@@ -2,9 +2,9 @@
   <div class="login-page">
     <cp-nav-bar right-text="注册" @click-right="$router.push('/register')"></cp-nav-bar>
     <div class="login-head">
-      <h3>密码登录</h3>
-      <a href="javascript:;">
-        <span>短信验证码登录</span>
+      <h3>{{ isPass ? '密码登录' : '短信验证码登录' }}</h3>
+      <a href="javascript:;" @click="isPass = !isPass">
+        <span>{{ !isPass ? '密码登录' : '短信验证码登录' }}</span>
         <van-icon name="arrow"></van-icon>
       </a>
     </div>
@@ -13,10 +13,12 @@
       <van-field
         v-model="loginForm.mobile"
         :rules="mobileRules"
+        name="mobile"
         placeholder="请输入手机号码"
         type="tel"
       />
       <van-field
+        v-if="isPass"
         v-model="loginForm.password"
         :rules="passwordRules"
         placeholder="请输入密码"
@@ -24,6 +26,13 @@
       >
         <template #button>
           <cp-icon @click="show = !show" :name="`login-eye-${show ? 'on' : 'off'}`"></cp-icon>
+        </template>
+      </van-field>
+      <van-field v-else placeholder="短信验证码" v-model="code" :rules="codeRules">
+        <template #button>
+          <span class="btn-send" @click="send">{{
+            time > 0 ? time + 's后再次发送' : '发送验证码'
+          }}</span>
         </template>
       </van-field>
       <div class="cp-cell">
@@ -55,28 +64,51 @@
 <script setup lang="ts">
 import { showToast } from 'vant'
 import { ref } from 'vue'
-import { mobileRules, passwordRules } from '@/utils/rules'
+import { mobileRules, passwordRules, codeRules } from '@/utils/rules'
 import cpIcon from '@/components/cp-icon.vue'
-import type { loginParamsRules } from '@/services/types/user'
-import { loginPost } from '@/services/user'
+
+import { loginPost, sendMobileCode, loginByMobile } from '@/services/user'
 import { useUserStore } from '@/stores'
 import { useRoute, useRouter } from 'vue-router'
 const store = useUserStore()
 const router = useRouter()
 const route = useRoute()
-
+const isPass = ref(true)
 const show = ref(false)
-const loginForm = ref<loginParamsRules>({
+const code = ref('')
+const loginForm = ref({
   mobile: '13230000001',
-  password: 'abc12345'
+  password: 'abc12345',
+  code: ''
 })
+
+const time = ref(0)
+let timeId: number = 0
+
+const send = async () => {
+  if (time.value > 0) return
+  // 调用接口
+  const codeRes = await sendMobileCode(loginForm.value.mobile, 'login')
+  console.log('codeRes', codeRes)
+
+  showToast('发送成功')
+  time.value = 60
+  clearInterval(timeId)
+  timeId = setInterval(() => {
+    time.value--
+  }, 1000)
+}
 
 const agree = ref<boolean>(false)
 const hanleLogin = async () => {
   if (!agree.value) return showToast('请勾选我已同意')
-  const res = await loginPost(loginForm.value)
-  console.log(res)
-  store.setUser(res.data.token)
+
+  const loginRes = isPass.value
+    ? await loginPost(loginForm.value.mobile, loginForm.value.password)
+    : await loginByMobile(loginForm.value.mobile, code.value)
+
+  showToast(loginRes.data.code)
+  store.setUser(loginRes.data.token)
   router.push((route.query.returnUrl as string) || '/user')
   showToast('登录成功')
 }
@@ -149,6 +181,14 @@ const hanleLogin = async () => {
       color: var(--cp-primary);
       padding: 0 5px;
     }
+  }
+}
+
+.btn-send {
+  color: var(--cp-primary);
+
+  &.active {
+    color: rgba(22, 194, 163, 0.5);
   }
 }
 </style>
