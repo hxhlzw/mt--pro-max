@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/user'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -12,6 +11,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: () => import('../views/Register/index.vue')
+    },
+    {
+      path: '/user/patient',
+      component: () => import('@/views/User/PatientPage.vue'),
+      meta: { title: '家庭档案' }
     },
     {
       path: '/',
@@ -43,7 +47,6 @@ const router = createRouter({
           path: '/user',
           name: 'user',
           meta: { title: '我的' },
-
           component: () => import('../views/User/index.vue')
         }
       ]
