@@ -6,6 +6,13 @@ defineProps<{
   }[]
   modelValue?: string | number
 }>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string | number): void
+}>()
+const toggleItem = (value: string | number) => {
+  emit('update:modelValue', value)
+}
 </script>
 
 <template>
@@ -16,6 +23,7 @@ defineProps<{
       v-for="item in options"
       :key="item.value"
       :class="{ active: modelValue === item.value }"
+      @click="toggleItem(item.value)"
     >
       {{ item.label }}
     </a>

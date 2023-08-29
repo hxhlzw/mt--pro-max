@@ -14,6 +14,9 @@
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const onClickLeft = () => {
+  if (props.back) {
+    return props.back()
+  }
   if (history.state?.back) {
     router.back()
   } else {
@@ -21,10 +24,11 @@ const onClickLeft = () => {
   }
 }
 // 父传子
-const props = defineProps({
-  title: String,
-  rightText: String
-})
+const props = defineProps<{
+  title?: string
+  rightText?: string
+  back?: () => void
+}>()
 
 const emits = defineEmits(['click-right'])
 const onClickRight = () => {
