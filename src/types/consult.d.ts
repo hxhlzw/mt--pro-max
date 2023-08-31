@@ -1,5 +1,4 @@
-// 文章类型，关注医生的文章|推荐的文章|减脂|饮食
-export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
+export type KnowledgeType = 'recommend' | 'fatReduction' | 'food' | 'like'
 
 export type Knowledge = {
   // 文章id
@@ -42,9 +41,74 @@ export type KnowledgePage = {
   // 数据
   rows: KnowledgeList
 }
-// 文章列表查询参数
-export type KnowledgeParams = {
-  type: KnowledgeType
+
+export type PageParams = {
+  // 页码
   current: number
+  // 条数
   pageSize: number
 }
+
+export type Doctor = {
+  /**
+   * 医生头像
+   */
+  avatar: string
+  consultationNum: number
+  /**
+   * 科室名称
+   */
+  depName: string
+  /**
+   * 医院等级-名称简写
+   */
+  gradeName: string
+  /**
+   * 医院名称
+   */
+  hospitalName: string
+  /**
+   * 医生id
+   */
+  id: string
+  /**
+   * 未登录用户默认返回0，登录用户实际判断是否关注的标志1已关注0未关注
+   */
+  likeFlag: 0 | 1
+  major: string
+  /**
+   * 医生姓名
+   */
+  name: string
+  /**
+   * 职称
+   */
+  positionalTitles: string
+  score: number
+  /**
+   * 接诊费用
+   */
+  serviceFee: number
+}
+
+export type DoctorList = Doctor[]
+
+export type DoctorPage = {
+  pageTotal: number
+  total: number
+  rows: DoctorList
+}
+
+export type LikeParams = {
+  /**
+   * 对应的id
+   */
+  id: string
+  /**
+   * topic百科话题,knowledge百科文章,doc医生,disease疾病
+   */
+  type: string
+}
+
+// 关注的类型，医生|文章|百科话题|疾病
+export type FollowType = 'doc' | 'knowledge' | 'topic' | 'disease'

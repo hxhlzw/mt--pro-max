@@ -6,9 +6,9 @@
     </div>
     <div class="body">
       <!-- swipe 组件 -->
-      <van-swipe :width="150" :show-indicators="false" :loop="false">
-        <van-swipe-item v-for="item in 5" :key="item">
-          <DoctorCard></DoctorCard>
+      <van-swipe :width="(150 / 375) * width" :show-indicators="false" :loop="false">
+        <van-swipe-item v-for="item in list" :key="item.id">
+          <DoctorCard :item="item"></DoctorCard>
         </van-swipe-item>
       </van-swipe>
     </div>
@@ -17,6 +17,20 @@
 
 <script setup lang="ts">
 import DoctorCard from './DoctorCard.vue'
+import { getDoctorPage } from '@/services/consult'
+import type { DoctorList } from '@/types/consult'
+import { onMounted, ref } from 'vue'
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+const list = ref<DoctorList>()
+const loadData = async () => {
+  const res = await getDoctorPage({ current: 1, pageSize: 5 })
+  console.log(res)
+
+  list.value = res.data.rows
+}
+onMounted(() => loadData())
 </script>
 
 <style lang="scss" scoped>
