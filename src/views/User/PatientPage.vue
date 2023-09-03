@@ -1,9 +1,20 @@
 <template>
-  <CpNavBar title="家庭档案" @click-left="onClickLeft"></CpNavBar>
+  <CpNavBar :title="isChange ? '选择患者' : '家庭档案'" @click-left="onClickLeft"></CpNavBar>
 
   <div class="patient-page">
+    <!-- 头部提示 -->
+    <div class="patient-change" v-if="isChange">
+      <h3>请选择患者信息</h3>
+      <p>以便医生给出更准确的治疗，信息仅医生可见</p>
+    </div>
     <div class="patient-list">
-      <div class="patient-item" v-for="(item, index) in list" :key="index">
+      <div
+        class="patient-item"
+        v-for="(item, index) in list"
+        :key="index"
+        @click="selectedPatient(item)"
+        :class="{ selected: patientId === item.id }"
+      >
         <div class="info">
           <span class="name">{{ item.name }}</span>
           <span class="id">{{ item.idCard.replace(/^(.{6})(?:\d+)(.{4})$/, '\$1******\$2') }}</span>
@@ -47,19 +58,28 @@
         <van-action-bar-button @click="remove">删除</van-action-bar-button>
       </van-action-bar>
     </van-popup>
+    <!-- 底部按钮 -->
+    <div class="patient-next" v-if="isChange">
+      <van-button type="primary" @click="next" round block>下一步</van-button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Validator from 'id-validator'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { addPatient, editPatient, delPatient } from '@/services/user'
 import { grtPatienLIst } from '@/services/patient'
 import type { Patient, PatientList } from '@/types/user'
 import { computed, ref } from 'vue'
 import { showToast } from 'vant'
 import { showConfirmDialog } from 'vant'
+const store = useConsultStore()
+import { useConsultStore } from '@/stores/consult'
+const isChange = computed(() => route.query.isChange === '1')
 const router = useRouter()
+const route = useRoute()
+
 const onClickLeft = () => {
   if (history.state?.back) {
     router.back()
@@ -79,6 +99,12 @@ const fn = async () => {
   let res = await grtPatienLIst()
   console.log(res)
   list.value = res.data
+  // 设置默认选中的ID，当你是选择患者的时候，且有患者信息的时候
+  if (isChange.value && list.value.length) {
+    const defPatient = list.value.find((item) => item.defaultFlag === 1)
+    if (defPatient) patientId.value = defPatient.id
+    else patientId.value = list.value[0].id
+  }
 }
 fn()
 // 2. 打开侧滑栏
@@ -92,6 +118,11 @@ const showPopup = (item?: Patient) => {
     patient.value = { ...initPatient }
   }
   show.value = true
+}
+const next = async () => {
+  if (!patientId.value) return showToast('请选就诊择患者')
+  store.setPatient(patientId.value)
+  router.push('/consult/pay')
 }
 // const patient = ref<Patient>({
 //   name: '',
@@ -145,9 +176,35 @@ const remove = async () => {
     showToast('删除成功')
   }
 }
+const patientId = ref<string>()
+const selectedPatient = (item: Patient) => {
+  if (isChange.value) {
+    patientId.value = item.id
+  }
+}
 </script>
 
 <style lang="scss" scoped>
+.patient-change {
+  padding: 15px;
+  > h3 {
+    font-weight: normal;
+    margin-bottom: 5px;
+  }
+  > p {
+    color: var(--cp-text3);
+  }
+}
+.patient-next {
+  padding: 15px;
+  background-color: #fff;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  box-sizing: border-box;
+}
 .patient-page {
   padding: 6px 0 80px;
 

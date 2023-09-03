@@ -23,6 +23,28 @@ const router = createRouter({
       meta: { title: '家庭档案' }
     },
     {
+      path: '/consult/illness',
+      component: () => import('@/views/Consult/ConsultIllness.vue'),
+      meta: { title: '病情描述' }
+    },
+    {
+      path: '/consult/pay',
+      component: () => import('@/views/Consult/ConsultPay.vue'),
+      meta: { title: '问诊支付' }
+    },
+    {
+      path: '/consult/fast',
+      name: 'fast',
+      component: () => import('../views/Consult/ConsultFast.vue'),
+      meta: { title: '极速问诊' }
+    },
+    {
+      path: '/consult/dep',
+      name: 'dep',
+      component: () => import('../views/Consult/ConsultDep.vue'),
+      meta: { title: '选择科室' }
+    },
+    {
       path: '/',
       name: 'layout',
       component: () => import('../views/Layout/index.vue'),
