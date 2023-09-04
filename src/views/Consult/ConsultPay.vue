@@ -85,7 +85,7 @@ const onClose = () => {
       return true
     })
 }
-onMounted(() => {
+;() => {
   if (
     !store.consult.type ||
     !store.consult.illnessDesc ||
@@ -103,7 +103,7 @@ onMounted(() => {
   }
   initPayInfo()
   initPatientInfo()
-})
+}
 </script>
 
 <template>
