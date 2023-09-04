@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import type { KnowledgeParams } from './types/consult'
-import type { ConsultOrderPreData, ConsultOrderPreParams } from '@/types/consult'
+import type { ConsultOrderPreData, ConsultOrderPreParams, PartialConsult } from '@/types/consult'
 import type {
   KnowledgePage,
   PageParams,
@@ -38,3 +38,16 @@ export const uploadImage = (file: File) => {
 // 拉取预支付订单信息
 export const getConsultOrderPre = (params: ConsultOrderPreParams) =>
   request<ConsultOrderPreData>('/patient/consult/order/pre', 'GET', params)
+
+// 生成订单
+export const createConsultOrder = (data: PartialConsult) =>
+  request<{ id: string }>('/patient/consult/order', 'POST', data)
+
+// 发起支付
+export const getConsultOrderPayUrl = (payParams: {
+  paymentMethod: 0 | 1
+  orderId: string
+  payCallback: string
+}) => {
+  return request<{ payUrl: string }>('/patient/consult/pay', 'POST', payParams)
+}

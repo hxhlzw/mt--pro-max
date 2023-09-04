@@ -149,8 +149,6 @@ const next = () => {
 
 <style lang="scss" scoped>
 .consult-illness-page {
-  padding-top: 46px;
-
   .illness-tip {
     display: flex;
     padding: 15px;

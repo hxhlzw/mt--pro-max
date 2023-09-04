@@ -77,7 +77,7 @@ const isPass = ref(true)
 const show = ref(false)
 const code = ref('')
 const loginForm = ref({
-  mobile: '13230000001',
+  mobile: '13230000100',
   password: 'abc12345',
   code: ''
 })
