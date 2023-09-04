@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 NProgress.configure({
   showSpinner: false
 })
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/login',
@@ -39,10 +39,22 @@ const router = createRouter({
       meta: { title: '极速问诊' }
     },
     {
+      path: '/user/consult',
+      name: 'consult',
+      component: () => import('../views/User/ConsultPage.vue'),
+      meta: { title: '问诊记录' }
+    },
+    {
       path: '/consult/dep',
       name: 'dep',
       component: () => import('../views/Consult/ConsultDep.vue'),
       meta: { title: '选择科室' }
+    },
+    {
+      path: '/room',
+      name: 'room',
+      component: () => import('../views/Room/index.vue'),
+      meta: { title: '问诊室' }
     },
     {
       path: '/',
