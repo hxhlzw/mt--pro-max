@@ -55,6 +55,7 @@ export enum OrderType {
   ConsultComplete = 4,
   /** 取消问诊 */
   ConsultCancel = 5,
+
   // 药品订单
   /** 待支付 */
   MedicinePay = 10,

@@ -68,3 +68,12 @@ export const cancelOrder = (id: string | number) => {
 export const deleteOrder = (id: string | number) => {
   return request(`/patient/order/${id}`, 'DELETE')
 }
+// 查看处方
+export const getPrescriptionPic = (id: string | number) => {
+  return request<{ id: string; url: string }>(`patient/consult/prescription/${id}`, 'GET')
+}
+
+// 查看订单详情
+export const getOrderDetail = (orderId: string) => {
+  return request<ConsultOrderItem>('/patient/consult/order/detail', 'GET', { orderId })
+}

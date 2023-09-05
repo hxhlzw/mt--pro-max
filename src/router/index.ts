@@ -28,9 +28,20 @@ const router = createRouter({
       meta: { title: '病情描述' }
     },
     {
+      path: '/user/consult/:id',
+      name: 'detail',
+      component: () => import('../views/User/ConsultDetail.vue'),
+      meta: { title: '问诊详情' }
+    },
+    {
       path: '/consult/pay',
       component: () => import('@/views/Consult/ConsultPay.vue'),
       meta: { title: '问诊支付' }
+    },
+    {
+      path: '/order/pay',
+      component: () => import('@/views/Order/OrderPay.vue'),
+      meta: { title: '药品支付' }
     },
     {
       path: '/consult/fast',
