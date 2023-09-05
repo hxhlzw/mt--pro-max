@@ -1,6 +1,11 @@
 import request from '@/utils/request'
 import type { KnowledgeParams } from './types/consult'
-import type { ConsultOrderPreData, ConsultOrderPreParams, PartialConsult } from '@/types/consult'
+import type {
+  ConsultOrderItem,
+  ConsultOrderPreData,
+  ConsultOrderPreParams,
+  PartialConsult
+} from '@/types/consult'
 import type {
   KnowledgePage,
   PageParams,

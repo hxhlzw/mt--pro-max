@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { PatientType } from '@/types/user'
+import type { Patient } from '@/types/user'
 export const grtPatienLIst = () => {
-  return request<PatientType>('/patient/mylist', 'GET')
+  return request<Patient>('/patient/mylist', 'GET')
 }

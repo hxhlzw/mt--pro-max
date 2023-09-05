@@ -1,52 +1,55 @@
-import { useUserStore } from '@/stores'
-import router from '@/router'
+import type { InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import axios, { type Method } from 'axios'
+import { useUserStore } from '../stores/user'
 import { showToast } from 'vant'
-
-// 1. 新axios实例，基础配置
+import router from '../router'
 
 const instance = axios.create({
   baseURL: '/dev-api',
   timeout: 10000
 })
 
-// 2. 请求拦截器，携带token
+// 请求拦截器
 instance.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
+    // 通过请求头发送token
     const store = useUserStore()
-    if (store.user?.token && config.headers) {
-      config.headers['Authorization'] = `Bearer ${store.user?.token}`
+    if (store.user?.token) {
+      config.headers.Authorization = 'Bearer ' + store.user.token
     }
     return config
   },
-  (err) => Promise.reject(err)
-)
-
-// 3. 响应拦截器，剥离无效数据，401拦截
-instance.interceptors.response.use(
-  (res) => {
-    // 后台约定，响应成功，但是code不是10000，是业务逻辑失败
-    if (res.data?.code !== 10000) {
-      showToast(res.data?.message)
-      return Promise.reject(res.data)
-    }
-    // 业务逻辑成功，返回响应数据，作为axios成功的结果
-    return res.data
-  },
-  (err) => {
-    if (err.response.status === 401) {
-      // 删除用户信息
-      const store = useUserStore()
-      store.delUser()
-      // 跳转登录，带上接口失效所在页面的地址，登录完成后回跳使用
-      router.push(`/login?${router.currentRoute.value.fullPath}`)
-    }
-    return Promise.reject(err)
+  (error) => {
+    return Promise.reject(error)
   }
 )
 
-const request = (url: string, method: Method = 'GET', submitData?: object) => {
-  return instance({
+// 响应拦截器
+instance.interceptors.response.use(
+  (res: AxiosResponse) => {
+    if (res.data.code !== 10000) {
+      // TODO toast
+      showToast(res.data.message)
+      // 错误的业务码返回出去
+      return Promise.reject(res.data)
+    }
+    return res.data
+  },
+  (error) => {
+    // token过期处理
+    if (error.response.status === 401) {
+      // 1. 清空本地的用户信息/token pinia用户信息/token
+      const store = useUserStore()
+      store.delUser()
+      // 2. 回到登录页
+      router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
+    }
+    return Promise.reject(error)
+  }
+)
+
+const request = <T>(url: string, method: Method = 'GET', submitData?: object) => {
+  return instance.request<T, T>({
     url,
     method,
     [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
