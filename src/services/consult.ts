@@ -54,7 +54,9 @@ export const getConsultOrderPayUrl = (payParams: {
   orderId: string
   payCallback: string
 }) => {
-  return request<{ payUrl: string }>('/patient/consult/pay', 'POST', payParams)
+  return request<{
+    payUrl: string
+  }>('/patient/consult/pay', 'POST', payParams)
 }
 
 import type { ConsultOrderListParams, ConsultOrderPage } from '@/types/consult'

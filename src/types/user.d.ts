@@ -25,6 +25,31 @@ export type UserInfo = OmitUser & {
 }
 // 家庭档案-患者信息
 export type Patient = {
+  data: {
+    id?: string | undefined
+    name: string
+    idCard: string
+    defaultFlag?: 0 | 1 | undefined
+    gender: 0 | 1
+    genderValue?: string | undefined
+    age?:
+      | {
+          toString: (radix?: number | undefined) => string
+          toFixed: (fractionDigits?: number | undefined) => string
+          toExponential: (fractionDigits?: number | undefined) => string
+          toPrecision: (precision?: number | undefined) => string
+          valueOf: () => number
+          toLocaleString: {
+            (
+              // 家庭档案-患者信息
+              locales?: string | string[] | undefined, // 患者ID
+              options?: Intl.NumberFormatOptions | undefined // 身份证号
+            ): string
+            (locales?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions | undefined): string
+          }
+        }
+      | undefined
+  }[]
   // 患者ID
   id?: string
   // 患者名称

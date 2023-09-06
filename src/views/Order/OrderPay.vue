@@ -1,41 +1,43 @@
 <template>
-  <div class="order-pay-page">
+  <div class="order-pay-page" v-if="address && OrdPre">
     <cp-nav-bar title="药品支付" />
     <div class="order-address">
       <p class="area">
         <van-icon name="location" />
-        <span>北京市昌平区</span>
+        <span>{{ address?.city }}{{ address?.county }}</span>
       </p>
-      <p class="detail">建材城西路金燕龙办公楼999号</p>
-      <p>李富贵 13211112222</p>
+      <p class="detail">{{ address?.addressDetail }}</p>
+      <p>
+        {{ address?.receiver }} {{ address?.mobile?.replace(/^(\d{3})\d+(\d{4})$/, '\$1****\$2') }}
+      </p>
     </div>
     <div class="order-medical">
       <div class="head">
         <h3>优医药房</h3>
         <small>优医质保 假一赔十</small>
       </div>
-      <div class="item van-hairline--top" v-for="i in 2" :key="i">
-        <img class="img" src="@/assets/ad.png" alt="" />
+      <div class="item van-hairline--top" v-for="(item, index) in OrdPre!?.medicines" :key="index">
+        <img class="img" :src="item.avatar" alt="" />
         <div class="info">
           <p class="name">
-            <span>优赛明 维生素E乳</span>
-            <span>x1</span>
+            <span>{{ item.name }}</span>
+            <span>x {{ item.quantity }}</span>
           </p>
           <p class="size">
-            <van-tag>处方药</van-tag>
-            <span>80ml</span>
+            <van-tag v-if="item.prescriptionFlag == 1">处方药</van-tag>
+            <span>{{ item.specs }}</span>
           </p>
-          <p class="price">￥25.00</p>
+          <p class="price">￥{{ item.amount }}</p>
         </div>
-        <div class="desc">用法用量：口服，每次1袋，每天3次，用药3天</div>
+        <div class="desc">{{ item.usageDosag }}</div>
       </div>
     </div>
     <div class="order-detail">
       <van-cell-group>
-        <van-cell title="药品金额" value="￥50" />
-        <van-cell title="运费" value="￥4" />
-        <van-cell title="优惠券" value="-￥0" />
-        <van-cell title="实付款" value="￥54" class="price" />
+        <van-cell title="药品金额" :value="`￥${OrdPre?.actualPayment}`" />
+        <van-cell title="运费" :value="`￥${OrdPre?.expressFee}`" />
+        <van-cell title="优惠券" :value="`-￥${OrdPre?.couponDeduction}`" />
+        <van-cell title="实付款" :value="`￥${OrdPre?.payment}`" class="price" />
       </van-cell-group>
     </div>
     <div class="order-tip">
@@ -43,33 +45,90 @@
         由于药品的特殊性，如非错发、漏发药品的情况，药品一经发出
         不得退换，请核对药品信息无误后下单。
       </p>
-      <van-checkbox>我已同意<a href="javascript:;">支付协议</a></van-checkbox>
+      <van-checkbox v-model="agree">我已同意<a href="javascript:;">支付协议</a></van-checkbox>
     </div>
     <van-submit-bar
-      :price="50 * 100"
+      :loading="loading"
+      :price="OrdPre?.payment * 100"
       button-text="立即支付"
       button-type="primary"
       text-align="left"
+      @submit="onSubmit"
     ></van-submit-bar>
   </div>
+
+  <div class="order-pay-page" v-else>
+    <cp-nav-bar title="药品支付" />
+    <van-skeleton title avatar row="2" style="margin-top: 15px" />
+    <van-skeleton title row="4" style="margin-top: 50px" />
+    <van-skeleton title row="4" style="margin-top: 50px" />
+  </div>
+  <cp-pay-sheet
+    payCallback="order/pay/result"
+    :onClose="onClose"
+    :actualPayment="OrdPre?.actualPayment!"
+    v-model:show="show"
+    :orderId="medicalOrderId!"
+  ></cp-pay-sheet>
 </template>
 
 <script setup lang="ts">
-import { getAddressList, getMedicalOrderPre } from '@/services/order'
-import type { OrderPre, Address } from '@/types/order'
+import { getAdderss, getMedicineInfo, createMedicalOrder } from '@/services/order'
+import type { MedicineResponseType, addressResponseType } from '@/types/order'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { showConfirmDialog, showToast } from 'vant'
 const route = useRoute()
 
-const OrdPre = ref<OrderPre>()
-
+const OrdPre = ref<MedicineResponseType>()
+let address = ref<addressResponseType>()
 const fn = async () => {
-  const ordRes = await getMedicalOrderPre({ prescriptionId: route.query.id as string })
-  const res = await getAddressList()
+  const ordRes = await getMedicineInfo({ prescriptionId: route.query.id as string })
+  const res = await getAdderss()
+  address.value = res.data[0]
+  OrdPre.value = ordRes.data
   console.log(ordRes)
-  console.log(res)
 }
 fn()
+
+const agree = ref(false)
+
+// 获取处方id
+const prescriptionId = route.query.id && route.query.id
+// loading
+const loading = ref(false)
+
+const show = ref(false)
+const medicalOrderId = ref<string>()
+const onSubmit = async () => {
+  if (!agree.value) return showToast('请勾选支付协议')
+  if (!address.value?.id) return showToast('请选择收获地址')
+  if (!prescriptionId) return showToast('未找到处方')
+  // 调用生成药品订单接口，生成药品订单
+  const Res = await createMedicalOrder({
+    id: prescriptionId as string,
+    addressId: address.value.id as string
+  })
+  show.value = true
+  medicalOrderId.value = Res.data.id
+  console.log('Res', Res)
+}
+const onClose = () => {
+  return showConfirmDialog({
+    title: '关闭支付',
+    message: '取消支付将无法获得医生回复，医生接诊名额有限，是否确认关闭？',
+    cancelButtonText: '仍要关闭',
+    confirmButtonText: '继续支付',
+    confirmButtonColor: 'var(--cp-primary)'
+  })
+    .then((res) => {
+      return false
+    })
+    .catch((error) => {
+      // router.push('/user/consult')
+      return true
+    })
+}
 </script>
 
 <style lang="scss" scoped>

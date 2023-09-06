@@ -36,6 +36,7 @@ const props = defineProps<{
   orderId: string
   actualPayment: number
   onClose?: () => void
+  payCallback: string
 }>()
 
 const emit = defineEmits<{
