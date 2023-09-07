@@ -3,7 +3,8 @@ import type {
   MedicineResponseType,
   MedicineType,
   addressResponseType,
-  OrderDetailResponseType
+  OrderDetailResponseType,
+  ExpressResponseType
 } from '@/types/order'
 import request from '@/utils/request'
 
@@ -27,4 +28,8 @@ export const createMedicalOrder = (data: MedicineOrderType) => {
 // 获取药品订单详情
 export const getMedicalOrderDetail = (id: string) => {
   return request<OrderDetailResponseType>(`/patient/medicine/order/detail/${id}`, 'GET')
+}
+// 获取物流信息
+export const getLogisticsDetail = (id: string) => {
+  return request<ExpressResponseType>(`/patient/order/${id}/logistics`, 'GET')
 }

@@ -64,7 +64,7 @@
     <van-skeleton title row="4" style="margin-top: 50px" />
   </div>
   <cp-pay-sheet
-    payCallback="order/pay/result"
+    payCallback="http://localhost:5173/#/order/pay/result"
     :onClose="onClose"
     :actualPayment="OrdPre?.actualPayment!"
     v-model:show="show"
@@ -109,8 +109,9 @@ const onSubmit = async () => {
     id: prescriptionId as string,
     addressId: address.value.id as string
   })
-  show.value = true
   medicalOrderId.value = Res.data.id
+  show.value = true
+
   console.log('Res', Res)
 }
 const onClose = () => {

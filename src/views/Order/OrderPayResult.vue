@@ -15,7 +15,6 @@ const initMedicineOrderDetail = async () => {
 }
 initMedicineOrderDetail()
 </script>
-
 <template>
   <div class="order-pay-result-page">
     <cp-nav-bar title="药品支付结果" />
@@ -41,8 +40,6 @@ initMedicineOrderDetail()
 
 <style lang="scss" scoped>
 .order-pay-result-page {
-  padding-top: 46px;
-
   .result {
     display: flex;
     flex-direction: column;

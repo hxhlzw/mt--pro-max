@@ -79,7 +79,7 @@
         </div>
       </div>
       <div class="foot">
-        <span @click="$router.push('/order/pay?id=6938590892097536')">购买药品</span>
+        <span @click="$router.push('/order/pay?id=6938942900535296')">购买药品</span>
       </div>
     </div>
   </div>

@@ -97,6 +97,7 @@
   </div>
 
   <cp-pay-sheet
+    payCallback="http://localhost/room"
     v-model:show="show"
     :actualPayment="detailInfo?.actualPayment!"
     :onClose="onClose"

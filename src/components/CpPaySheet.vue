@@ -31,6 +31,7 @@ import { getConsultOrderPayUrl } from '@/services/consult'
 import { showToast } from 'vant'
 import { ref } from 'vue'
 
+// const { orderId, show, payCallback }
 const props = defineProps<{
   show: boolean
   orderId: string
@@ -48,11 +49,12 @@ const paymentMethod = ref<0 | 1>()
 // 发起支付
 const handlePay = async () => {
   if (!paymentMethod.value) return showToast('请选择支付方式')
+  console.log(props.orderId, '1111')
 
   const payRes = await getConsultOrderPayUrl({
     paymentMethod: paymentMethod.value,
     orderId: props.orderId,
-    payCallback: 'http://localhost:5173/#/room'
+    payCallback: props.payCallback
   })
 
   window.location.href = payRes.data.payUrl
